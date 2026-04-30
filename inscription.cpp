@@ -77,9 +77,13 @@ void Inscription::lister(std::string fichier)
             ui->liste->setItemWidget(item,widget);
 
             //------CONNECTER MOFIDIER
-            std::cout << "Fin\n";
-            connect(modif,SIGNAL(clicked()),this,SLOT(modifier()));
 
+            connect(modif, &QPushButton::clicked, this, [=]() {
+                modifier(item);
+            });
+            connect(suppr, &QPushButton::clicked, this, [=]() {
+                desabonne(item);
+            });
         }
 
     }
@@ -105,77 +109,65 @@ void Inscription::inscrire()
     lister("liste.txt");
 }
 
-// void Inscription::modifier()
-// {
-//     std::cout << "ok\n";
-//     int position_actuelle,i;
-//     Personne new_Personne;
-//     Modification M;
-//     std::string chaine;
-//     std::fstream file("liste.txt",std::ios::app);
-//     std::vector<Personne>::iterator it;
-//     position_actuelle=ui->liste->currentRow();
-//     Modif->set_oldPersonne(P[position_actuelle]);
-//     Modif->show();
-//     new_Personne=Modif->get_newPersonne();
-//     P[position_actuelle]=new_Personne;
-
-//     //Reinitialiser le vector P
-//     if(file.is_open())
-//     {
-//         for (it=P.begin();it!=P.end();i++)
-//         {
-//             chaine=it->getNom() + ":" + it->getPassword() + "\n";
-//             file << chaine;
-//         }
-//     }
-//     lister("liste.txt");
-// }
-
-void Inscription::modifier()
+void Inscription::modifier(QListWidgetItem *item)
 {
-    std::cout << "SLOT\n";
+    int position_actuelle;
+    std::string ligne ;
+
+    position_actuelle=ui->liste->row(item);
+
+    std::cout << "Pos actuelle : " << position_actuelle << "Item : " << item->text().toStdString() << std::endl;
+    Modif->set_position(position_actuelle);
     Modif->show();
+    std::cout << "FIN DE MODIFICATION" << std::endl;
+}
+
+void Inscription::desabonne(QListWidgetItem *item)
+{
+    std::cout << "des\n";
+    int position_supprime,i;
+    std::vector <std::string> lignes;
+    std::vector <std::string>::iterator it;
+    std::string ligne;
+    position_supprime=ui->liste->row(item);
+    std::ifstream file("liste.txt");
+    std::cout << "POS : " << position_supprime << std::endl;
+
+    while (std::getline(file, ligne)) {
+
+        lignes.push_back(ligne);
+    }
+
+    file.close();
+
+    std::ofstream fic ("liste.txt");
+    fic << "";
+    fic.close();
+
+    i=0;
+    std::ofstream f("liste.txt",std::ios::app);
+    if(f.is_open())
+    {
+        for(it=lignes.begin();it!=lignes.end();it++)
+        {
+            if(i==position_supprime)
+            {
+                i++;
+                continue;
+            }
+            *it = *it + "\n";
+            f<<*it;
+            i++;
+        }
+        f.close();
+    }
+
+
+
+    lister("liste.txt");
 }
 
 
-// void Inscription::desabonne()
-// {
-//     std::string ancien,chaine;
-//     Personne *P1=new Personne();
-//     Personne P_ancien=Personne();
-//     std::cout << "Ancien nom : " ;
-//     std::getline(std::cin,chaine);
-//     P_ancien.setNom(ancien);
-//     std::cout << "Nouvel nom : " ;
-//     std::getline(std::cin,chaine);
-//     P1->setNom(chaine);
-//     std::cout << "Ancien mot de pass : ";
-//     std::getline(std::cin,chaine);
-//     P_ancien.setPassword(ancien);
-//     std::cout << "Nouvel mot de pass : ";
-//     std::getline(std::cin,chaine);
-//     P1->setPassword(chaine);
-//     for (std::vector<Personne>::iterator i=P.begin();i!=P.end();i++)
-//     {
-//         if(i->getNom()==P_ancien.getNom() && i->getPassword()==P_ancien.getPassword())
-//         {
-//             i->setNom(P1->getNom());
-//             i->setPassword(P1->getPassword());
-//         }
-//     }
-//     std::vector <Personne>::iterator trouve = std::find_if(P.begin(),P.end(),[P_ancien](Personne X){return X==P_ancien;});
-//     *trouve = *P1;
-// }
-
-// void Inscription::lister()
-// {
-//     std::cout << "LISTE DES INSCRITS" << std::endl;
-//     for (std::vector <Personne>::iterator i=P.begin() ; i!=P.end() ; i++ )
-//     {
-//         std::cout << i->getNom() << std::endl;
-//     }
-// }
 
 
 Inscription::~Inscription()
