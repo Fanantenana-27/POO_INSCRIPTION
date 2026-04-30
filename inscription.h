@@ -5,6 +5,7 @@
 #include <vector>
 #include "personne.h"
 #include "modification.h"
+#include <QListWidgetItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,8 +22,8 @@ public:
     ~Inscription();
 public slots:
     void inscrire();
-    //void desabonne();
-    void modifier();
+    void desabonne(QListWidgetItem *item);
+    void modifier(QListWidgetItem *item);
     //void recherche();
     void lister(std::string fichier);
 private:
